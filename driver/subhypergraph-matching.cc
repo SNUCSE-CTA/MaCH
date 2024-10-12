@@ -1,5 +1,4 @@
 #include <iostream>
-#include <iomanip>
 #include "DataStructure/HyperGraph.h"
 #include "SubhypergraphMatching/DataHyperGraph.h"
 #include "SubhypergraphMatching/PatternHyperGraph.h"
@@ -14,7 +13,8 @@ using SubHyperGraphMatching::DataHyperGraph;
 using SubHyperGraphMatching::PatternHyperGraph;
 
 int32_t main(int argc, char *argv[]) {
-    std::string data_file = "./amazon-reviews.out", query_file;
+    std::string data_file, query_file;
+    SubHyperGraphMatching::SubHyperGraphMatchingOption opt;
     for (int i = 1; i < argc; ++i) {
         if (argv[i][0] == '-') {
             switch (argv[i][1]) {
@@ -23,6 +23,9 @@ int32_t main(int argc, char *argv[]) {
                     break;
                 case 'q':
                     query_file = argv[i + 1];
+                    break;
+                case 'p':
+                    opt.print_answer = true;
                     break;
             }
         }
@@ -35,15 +38,13 @@ int32_t main(int argc, char *argv[]) {
         fprintf(stderr, "Query file %s does not exist\n", query_file.c_str());
         return 1;
     }
-    GraphLib::SubHyperGraphMatching::PatternHyperGraph PG;
+    PatternHyperGraph PG;
     PG.ReadPatternHyperGraph(query_file);
     PG.PrintStatistics("PatternGraph");
     Timer pre_timer, pre_timer_2; pre_timer.Start();
-    GraphLib::SubHyperGraphMatching::DataHyperGraph HG;
+    DataHyperGraph HG;
     HG.LoadDataGraph(data_file, PG);
     pre_timer.Stop();
     HG.PrintStatistics("Extracted DataGraph");
-
-    GraphLib::SubHyperGraphMatching::SubHyperGraphMatchingOption opt__;
-    GraphLib::SubHyperGraphMatching::Summit summit(&HG, &PG, opt__);
+    SubHyperGraphMatching::Summit summit(&HG, &PG, opt);
 }

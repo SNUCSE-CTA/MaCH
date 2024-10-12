@@ -1,8 +1,3 @@
-#include <iostream>
-#include <algorithm>
-#include <iomanip>
-#include <any>
-
 #include "DataStructure/HyperGraph.h"
 #include "SubhypergraphMatching/DataHyperGraph.h"
 #include "SubhypergraphMatching/PatternHyperGraph.h"
@@ -13,8 +8,7 @@ using SubHyperGraphMatching::DataHyperGraph;
 using SubHyperGraphMatching::PatternHyperGraph;
 
 int32_t main(int argc, char *argv[]) {
-    std::string dataset = "mathoverflow-answers";
-    std::string dataset_path = "../../data/";
+    std::string dataset, dataset_path;
     for (int i = 1; i < argc; ++i) {
         if (argv[i][0] == '-') {
             switch (argv[i][1]) {
@@ -30,6 +24,6 @@ int32_t main(int argc, char *argv[]) {
     std::string hyperedge_path = dataset_path + dataset + "/hyperedges-" + dataset + ".txt";
     std::string labels_path = dataset_path + dataset + "/node-labels-" + dataset + ".txt";
     std::string output_path = "./"+ dataset + ".out";
-    GraphLib::HyperGraph HG;
+    HyperGraph HG;
     HG.Preprocess(hyperedge_path, labels_path, output_path);
 }
