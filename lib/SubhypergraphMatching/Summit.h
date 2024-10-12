@@ -152,8 +152,8 @@ namespace GraphLib::SubHyperGraphMatching {
     };
 
     Summit::Summit(
-        GraphLib::SubHyperGraphMatching::DataHyperGraph *hyper_data_,
-        GraphLib::SubHyperGraphMatching::PatternHyperGraph *hyper_query_,
+        DataHyperGraph *hyper_data_,
+        PatternHyperGraph *hyper_query_,
         SubHyperGraphMatchingOption option) {
         opt = option;
         hyper_data = hyper_data_;
@@ -168,8 +168,9 @@ namespace GraphLib::SubHyperGraphMatching {
         AfterMemory.Start();
         bool SuccessHCS = BuildHyperCandidateSpace();
         AfterMemory.Stop();
-
-        fprintf(log_to, "HCSBuildingAndFileringTime: %.02lf\n", AfterMemory.GetTime());
+        PrintCSStatistics(1, 0);
+        fprintf(log_to, "HCSBuildingAndFileringTime: %.02lf\n",
+                AfterMemory.GetTime());
         traversed_node = 0;
         num_embedding = 0;
         Timer BtTimer;
@@ -194,9 +195,7 @@ namespace GraphLib::SubHyperGraphMatching {
         for (int u = 0; u < hyper_query->GetNumHyperedges(); u++) {
             num_vertices += cand_sz[stage][u];
             if (level >= 1) {
-                int label = hyper_query->GetHyperedgeLabel(u);
-                fprintf(log_to,
-                        "[LOG] Hyperedge %d: Matching %d Hyperedges\n",
+                fprintf(log_to, "[LOG] Hyperedge %d: Matching %d Hyperedges\n",
                         u, cand_sz[stage][u]);
                 if (level >= 2) {
                     for (int i = 0; i < cand_sz[stage][u]; i++) {
@@ -235,15 +234,6 @@ namespace GraphLib::SubHyperGraphMatching {
                 visited[e_] = 0;
             }
         }
-    }
-
-    inline int Summit::GetLogSize(int n) {
-        int ret = 0;
-        while (n >= 1) {
-            n /= 2;
-            ret++;
-        }
-        return ret;
     }
 
     void Summit::Initialize() {
@@ -345,8 +335,6 @@ namespace GraphLib::SubHyperGraphMatching {
 
     inline bool Summit::BuildHyperCandidateSpace() {
         BuildInitialHCS();
-
-        bool ret = true;
         for (int e = 0; e < hyper_query->GetNumHyperedges(); e++) {
             if (cand_sz[0][e] == 0) return false;
         }
@@ -512,7 +500,6 @@ namespace GraphLib::SubHyperGraphMatching {
         }
 
         for (int e = 0; e < hyper_query->GetNumHyperedges(); e++) {
-            int e_label = hyper_query->GetHyperedgeLabel(e);
             for (int en_idx = 0; en_idx < query_edge_adj[e].size(); en_idx++) {
                 int en = query_edge_adj[e][en_idx];
                 VqCuDuCun_64 += cand_sz[0][e] * initial_cand_sz_64[en];
@@ -606,7 +593,6 @@ namespace GraphLib::SubHyperGraphMatching {
         }
         std::vector<int> data_visited(hyper_data->GetNumHyperedges());
         std::stack<int> adj_data;
-        int maximum_adj = 0;
 
         for (int e = 0; e < hyper_query->GetNumHyperedges(); e++) {
             for (int en : query_edge_adj[e]) {
@@ -693,7 +679,6 @@ namespace GraphLib::SubHyperGraphMatching {
                 cand_nbr_2 += query_edge_adj[e].size();
                 for (int en_idx = 0; en_idx < query_edge_adj[e].size();
                      en_idx++) {
-                    int en = query_edge_adj[e][en_idx];
                     cand_nbr[e][f][en_idx] = cand_nbr_3;
                     cand_nbr_3 += cand_nbr_sz[e][f][en_idx];
                 }
@@ -729,7 +714,6 @@ namespace GraphLib::SubHyperGraphMatching {
 
         for (int e = 0; e < hyper_query->GetNumHyperedges(); e++) {
             for (int en : query_edge_adj[e]) {
-                int en_idx = query_edge_adj_idx[en][e];
                 int e_idx = query_edge_adj_idx[en][e];
                 if (!in_queue_removed[en][e_idx]) {
                     in_queue_removed[en][e_idx] = true;
@@ -737,9 +721,6 @@ namespace GraphLib::SubHyperGraphMatching {
                 }
             }
         }
-
-        PrintCSStatistics(1, 0);
-        fflush(stderr);
     }
 
     bool Summit::RestoreLocalMatch(int e, int f, int en_idx, int stage) {
@@ -799,17 +780,17 @@ namespace GraphLib::SubHyperGraphMatching {
             if (last_e == -1) {
                 fprintf(log_to, "  {");
                 for (int e = 0; e < hyper_query->GetNumHyperedges(); e++) {
-                    fprintf(log_to, "(%d, %d)%c", e,cand[e][0],
-                        " }"[e == hyper_query->GetNumHyperedges() - 1]);
+                    fprintf(log_to, "(%d, %d)%c", e, matched[e],
+                            " }"[e == hyper_query->GetNumHyperedges() - 1]);
                 }
                 fprintf(log_to, "\n");
-            }
-            else {
+            } else {
                 for (int i = 0; i < cand_sz[stage][last_e]; i++) {
                     fprintf(log_to, "  {");
                     for (int e = 0; e < hyper_query->GetNumHyperedges(); e++) {
-                        fprintf(log_to, "(%d, %d)%c",e, e == last_e ? cand[e][i] : cand[e][0],
-                            " }"[e == hyper_query->GetNumHyperedges() - 1]);
+                        fprintf(log_to, "(%d, %d)%c", e,
+                                e == last_e ? cand[e][i] : matched[e],
+                                " }"[e == hyper_query->GetNumHyperedges() - 1]);
                     }
                     fprintf(log_to, "\n");
                 }
@@ -826,7 +807,6 @@ namespace GraphLib::SubHyperGraphMatching {
             }
         }
         int initial_stage = 0;
-        int initial_d = 0;
 
         std::stack<std::array<int, 4>> something;
         something.push({initial_stage, 0, 0,
@@ -909,8 +889,6 @@ namespace GraphLib::SubHyperGraphMatching {
                             num_check_intersection++;
                             if (!poss) {
                                 conflict2++;
-                                int fn_idx = initial_cand_idx[en][fn];
-
                                 int n = SwapAndPop(cand[en], cand_idx[en],
                                                    cand_sz[stage][en],
                                                    cand_idx[en][fn]);
@@ -930,8 +908,6 @@ namespace GraphLib::SubHyperGraphMatching {
 
                     if (!valid) {
                         if (stage != 0) {
-                            int f = cand[divided_e][0];
-                            int f_idx = initial_cand_idx[divided_e][f];
                             SwapAndPop(cand[divided_e], cand_idx[divided_e],
                                        cand_sz[stage - 1][divided_e], 0);
                         }
@@ -979,9 +955,6 @@ namespace GraphLib::SubHyperGraphMatching {
                 }
             }
             if (stage != 0) {
-                int f = cand[divided_e][0];
-                int f_idx = initial_cand_idx[divided_e][f];
-
                 SwapAndPop(cand[divided_e], cand_idx[divided_e],
                            cand_sz[stage - 1][divided_e], 0);
             }

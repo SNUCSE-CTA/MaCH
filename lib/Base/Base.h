@@ -47,10 +47,3 @@ namespace std {
         }
     };
 }  // namespace std
-
-template <typename T>
-void EraseIndex(std::vector<T> &vec, int &idx) {
-    vec[idx] = vec.back();
-    vec.pop_back();
-    --idx;
-}

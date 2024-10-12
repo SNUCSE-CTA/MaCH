@@ -47,7 +47,6 @@ namespace GraphLib::SubHyperGraphMatching {
                 qbit[i++] = query_profiles[v];
             }
             std::sort(qbit, qbit + query->GetArity(qe));
-            return;
         }
 
         bool CheckMapping(int qe, int he) {
