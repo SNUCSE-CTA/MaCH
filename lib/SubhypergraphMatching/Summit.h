@@ -94,7 +94,7 @@ namespace GraphLib::SubHyperGraphMatching {
 
         void BuildInitialHCS();
 
-        bool RefineHCS(int stage = 0);
+        bool FilterHCS(int stage = 0);
 
         void GetQueryConnectivity();
 
@@ -343,7 +343,7 @@ namespace GraphLib::SubHyperGraphMatching {
         for (int e = 0; e < hyper_query->GetNumHyperedges(); e++) {
             if (cand_sz[0][e] == 0) return false;
         }
-        return RefineHCS();
+        return FilterHCS();
     }
 
     inline void Summit::PushCand(int *cand, int *idx, int &sz, int v) {
@@ -738,14 +738,14 @@ namespace GraphLib::SubHyperGraphMatching {
         return false;
     }
 
-    bool Summit::RefineHCS(int stage) {
+    bool Summit::FilterHCS(int stage) {
         while (!queue_removed.empty()) {
             auto [e, en_idx] = queue_removed.front();
             queue_removed.pop();
             int en = query_edge_adj[e][en_idx];
 
             if (matched[e] != -1) continue;
-            bool refined = false;
+            bool filtered = false;
             for (int i = cand_sz[stage][e] - 1; i >= 0; i--) {
                 int f = cand[e][i];
                 int f_idx = initial_cand_idx[e][f];
@@ -757,10 +757,10 @@ namespace GraphLib::SubHyperGraphMatching {
                         EmptyQueue();
                         return false;
                     }
-                    refined = true;
+                    filtered = true;
                 }
             }
-            if (refined) {
+            if (filtered) {
                 for (int en2 : query_edge_adj[e]) {
                     if (en2 == en) continue;
                     int e_idx = query_edge_adj_idx[en2][e];
