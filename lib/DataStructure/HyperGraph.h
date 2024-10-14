@@ -1,4 +1,5 @@
 #pragma once
+#include <set>
 #include <map>
 #include <vector>
 
@@ -17,6 +18,7 @@ namespace GraphLib {
         int num_vertex_labels = 0, num_hyperedge_labels = 0;
         std::vector<int> vertex_label, hyperedge_label;
         std::vector<std::vector<int>> hyperedge_signatures;
+        std::vector<int> hyperedge_id_map;
 
        public:
         HyperGraph() {};
@@ -81,7 +83,9 @@ namespace GraphLib {
             exit(1);
         }
         Timer index_build_timer;
+        std::set<std::vector<int>> hyperedge_set;
         std::map<std::vector<int>, std::vector<int>> hyperedges_by_signatures;
+        std::map<std::vector<int>, std::vector<int>> hyperedge_ids_by_signatures;
         std::ofstream fout(output_path, std::ios::binary);
         std::streampos start_pos = fout.tellp();
         std::ifstream fin(vertex_label_path);
@@ -110,6 +114,10 @@ namespace GraphLib {
             if (current_hyperedge.size() == 1) {
                 continue;
             }
+            if (hyperedge_set.contains(current_hyperedge)) {
+                continue;
+            }
+            hyperedge_set.insert(current_hyperedge);
             std::vector<int> current_signature(current_hyperedge.size());
             std::transform(current_hyperedge.begin(), current_hyperedge.end(),
                            current_signature.begin(), [this](int &elem) -> int {
@@ -120,11 +128,14 @@ namespace GraphLib {
             auto &v = hyperedges_by_signatures[current_signature];
             v.insert(v.end(), current_hyperedge.begin(),
                      current_hyperedge.end());
+            auto &v_id = hyperedge_ids_by_signatures[current_signature];
+            v_id.push_back(hyperedges.size() - 1);
             index_build_timer.Stop();
         }
         for (auto [signature, h] : hyperedges_by_signatures) {
             PrintVector(signature, fout, true);
             PrintVector(h, fout, true);
+            PrintVector(hyperedge_ids_by_signatures[signature], fout, true, false);
         }
         fprintf(stderr, "Wrote %.02lf KB to %s\n",
                 (fout.tellp() - start_pos) / 1024.0, output_path.c_str());

@@ -10,6 +10,7 @@ namespace GraphLib {
             std::vector<std::vector<int>> vertex_by_labels;
             std::vector<std::vector<int>> hyperedges_by_label;
             std::vector<int> vertex_compression_map;
+            std::vector<int> hyperedge_ids;
             std::unordered_map<int, int> vertex_compression_map_inv;
 
            public:
@@ -17,6 +18,7 @@ namespace GraphLib {
                 return hyperedges_by_label[l];
             }
             void LoadDataGraph(std::string &index_file, PatternHyperGraph &P);
+            int GetOrigHyperedgeId(const int idx) { return hyperedge_ids[idx]; }
         };
 
         void DataHyperGraph::LoadDataGraph(std::string &index_file,
@@ -49,14 +51,17 @@ namespace GraphLib {
                 int l = P.GetMappedHyperedgeLabel(signature);
                 if (l == -1) {
                     unsigned long long skip_bytes = num_hyperedges_by_signature;
-                    skip_bytes *= signature.size();
+                    skip_bytes *= (signature.size() + 1);
                     skip_bytes *= sizeof(int);
                     fin.seekg(skip_bytes, std::ios::cur);
                     continue;
                 }
                 std::vector<int> hyperedges_by_signature;
+                std::vector<int> hyperedge_ids_by_signature;
                 ReadVector(hyperedges_by_signature, fin, true,
                            num_hyperedges_by_signature * signature.size());
+                ReadVector(hyperedge_ids_by_signature, fin, true,
+                              num_hyperedges_by_signature);
                 total_arity += hyperedges_by_signature.size();
                 for (auto &elem : hyperedges_by_signature) {
                     vertex_compression_map[elem] = 0;
@@ -66,6 +71,7 @@ namespace GraphLib {
                     hyperedges.emplace_back(
                         hyperedges_by_signature.begin() + i,
                         hyperedges_by_signature.begin() + i + signature.size());
+                    hyperedge_ids.push_back(hyperedge_ids_by_signature[i / signature.size()]);
                 }
             }
             num_vertex = 0;
@@ -80,9 +86,13 @@ namespace GraphLib {
                     hyperedges[i][j] = vertex_compression_map[hyperedges[i][j]];
                 }
             }
+            for (int i = 0; i < hyperedges.size(); i++)
+                hyperedges[i].push_back(hyperedge_ids[i]);
             std::sort(hyperedges.begin(), hyperedges.end());
-            hyperedges.erase(std::unique(hyperedges.begin(), hyperedges.end()),
-                             hyperedges.end());
+            for (int i = 0; i < hyperedges.size(); i++) {
+                hyperedge_ids[i] = hyperedges[i].back();
+                hyperedges[i].pop_back();
+            }
             num_edge = hyperedges.size();
             for (auto &E : hyperedges) {
                 hyperedge_signatures.push_back(std::vector<int>());
