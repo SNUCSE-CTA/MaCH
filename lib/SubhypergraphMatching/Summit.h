@@ -778,7 +778,7 @@ namespace GraphLib::SubHyperGraphMatching {
     bool Summit::backtracking() {
         auto print_embedding = [&](int stage, int last_e = -1) {
             if (last_e == -1) {
-                fprintf(log_to, "  {");
+                fprintf(log_to, "  Embedding Found {");
                 for (int e = 0; e < hyper_query->GetNumHyperedges(); e++) {
                     fprintf(log_to, "(%d, %d)%c", e,
                         hyper_data->GetOrigHyperedgeId(matched[e]),
@@ -787,7 +787,7 @@ namespace GraphLib::SubHyperGraphMatching {
                 fprintf(log_to, "\n");
             } else {
                 for (int i = 0; i < cand_sz[stage][last_e]; i++) {
-                    fprintf(log_to, "  {");
+                    fprintf(log_to, "  Embedding Found {");
                     for (int e = 0; e < hyper_query->GetNumHyperedges(); e++) {
                         int f = e == last_e ? cand[e][i] : matched[e];
                         fprintf(log_to, "(%d, %d)%c", e,

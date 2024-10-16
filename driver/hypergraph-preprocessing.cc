@@ -8,22 +8,22 @@ using SubHyperGraphMatching::DataHyperGraph;
 using SubHyperGraphMatching::PatternHyperGraph;
 
 int32_t main(int argc, char *argv[]) {
-    std::string dataset, dataset_path;
+    std::string hyperedge_path, labels_path, output_path;
     for (int i = 1; i < argc; ++i) {
         if (argv[i][0] == '-') {
             switch (argv[i][1]) {
-                case 'p':
-                    dataset_path = argv[i + 1];
+                case 'o':
+                    output_path = argv[i + 1];
                     break;
-                case 'd':
-                    dataset = argv[i + 1];
+                case 'e':
+                    hyperedge_path = argv[i + 1];
+                    break;
+                case 'l':
+                    labels_path = argv[i + 1];
                     break;
             }
         }
     }
-    std::string hyperedge_path = dataset_path + dataset + "/hyperedges-" + dataset + ".txt";
-    std::string labels_path = dataset_path + dataset + "/node-labels-" + dataset + ".txt";
-    std::string output_path = "./"+ dataset + ".out";
     HyperGraph HG;
     HG.Preprocess(hyperedge_path, labels_path, output_path);
 }
