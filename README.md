@@ -1,5 +1,12 @@
 # Subhypergraph-Matching
 
+compile
+```bash
+mkdir build
+cd build
+cmake ..
+```
+
 ```bash
 ./SubHypergraphMatching -d [path_to_indexed_file] -q [path_to_query]
 ```
