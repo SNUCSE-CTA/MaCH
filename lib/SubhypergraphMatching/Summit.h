@@ -190,12 +190,12 @@ namespace GraphLib::SubHyperGraphMatching {
     Summit::~Summit() {}
 
     void Summit::PrintCSStatistics(int level, int stage) {
-        fprintf(log_to, "\e\[0;31m[CS Statistics at Stage %d]\n", stage);
+        fprintf(log_to, "\e\[0;31m[CS Statistics after Filtering]\n");
         int num_vertices = 0;
         for (int u = 0; u < hyper_query->GetNumHyperedges(); u++) {
             num_vertices += cand_sz[stage][u];
             if (level >= 1) {
-                fprintf(log_to, "[LOG] Hyperedge %d: Matching %d Hyperedges\n",
+                fprintf(log_to, "Hyperedge %d: Matching %d Hyperedges\n",
                         u, cand_sz[stage][u]);
                 if (level >= 2) {
                     for (int i = 0; i < cand_sz[stage][u]; i++) {
