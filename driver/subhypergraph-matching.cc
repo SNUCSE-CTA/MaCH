@@ -3,7 +3,7 @@
 #include "SubhypergraphMatching/DataHyperGraph.h"
 #include "SubhypergraphMatching/PatternHyperGraph.h"
 #include "Base/Timer.h"
-#include "SubhypergraphMatching/Summit.h"
+#include "SubhypergraphMatching/MaCH.h"
 using namespace std;
 using namespace GraphLib;
 
@@ -46,5 +46,5 @@ int32_t main(int argc, char *argv[]) {
     HG.LoadDataGraph(data_file, PG);
     pre_timer.Stop();
     HG.PrintStatistics("Extracted DataGraph");
-    SubHyperGraphMatching::Summit summit(&HG, &PG, opt);
+    SubHyperGraphMatching::MaCH MaCH(&HG, &PG, opt);
 }

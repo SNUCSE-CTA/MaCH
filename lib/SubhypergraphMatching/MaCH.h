@@ -14,7 +14,7 @@ namespace GraphLib::SubHyperGraphMatching {
         bool print_answer = false;
     };
 
-    class Summit {
+    class MaCH {
        private:
         SubHyperGraphMatchingOption opt;
         CellSignature *cell_signature;
@@ -82,11 +82,11 @@ namespace GraphLib::SubHyperGraphMatching {
         std::vector<int> unmapped_deg;
 
        public:
-        Summit(GraphLib::SubHyperGraphMatching::DataHyperGraph *hyper_data_,
+        MaCH(GraphLib::SubHyperGraphMatching::DataHyperGraph *hyper_data_,
                GraphLib::SubHyperGraphMatching::PatternHyperGraph *hyper_query_,
                SubHyperGraphMatchingOption option);
 
-        ~Summit();
+        ~MaCH();
 
         inline bool isCandidate(int u, int v, int stage) const {
             return cand_sz[stage][u] > cand_idx[u][v] && cand_idx[u][v] >= 0;
@@ -151,7 +151,7 @@ namespace GraphLib::SubHyperGraphMatching {
         int debugging = 0;
     };
 
-    Summit::Summit(
+    MaCH::MaCH(
         DataHyperGraph *hyper_data_,
         PatternHyperGraph *hyper_query_,
         SubHyperGraphMatchingOption option) {
@@ -187,9 +187,9 @@ namespace GraphLib::SubHyperGraphMatching {
         fprintf(log_to, "#Embeddings: %lld\n", ans);
     }
 
-    Summit::~Summit() {}
+    MaCH::~MaCH() {}
 
-    void Summit::PrintCSStatistics(int level, int stage) {
+    void MaCH::PrintCSStatistics(int level, int stage) {
         fprintf(log_to, "\e\[0;31m[CS Statistics after Filtering]\n");
         int num_vertices = 0;
         for (int u = 0; u < hyper_query->GetNumHyperedges(); u++) {
@@ -208,7 +208,7 @@ namespace GraphLib::SubHyperGraphMatching {
         fprintf(log_to, "Number of Hyperedges: %d \e[0m\n", num_vertices);
     }
 
-    void Summit::GetQueryConnectivity() {
+    void MaCH::GetQueryConnectivity() {
         std::vector<int> visited(hyper_query->GetNumHyperedges());
         query_edge_adj =
             std::vector<std::vector<int>>(hyper_query->GetNumHyperedges());
@@ -236,7 +236,7 @@ namespace GraphLib::SubHyperGraphMatching {
         }
     }
 
-    void Summit::Initialize() {
+    void MaCH::Initialize() {
         GetQueryConnectivity();
 
         MaxStage = 1;
@@ -333,7 +333,7 @@ namespace GraphLib::SubHyperGraphMatching {
         }
     }
 
-    inline bool Summit::BuildHyperCandidateSpace() {
+    inline bool MaCH::BuildHyperCandidateSpace() {
         BuildInitialHCS();
         for (int e = 0; e < hyper_query->GetNumHyperedges(); e++) {
             if (cand_sz[0][e] == 0) return false;
@@ -346,14 +346,14 @@ namespace GraphLib::SubHyperGraphMatching {
         return FilterHCS();
     }
 
-    inline void Summit::PushCand(int *cand, int *idx, int &sz, int v) {
+    inline void MaCH::PushCand(int *cand, int *idx, int &sz, int v) {
         idx[v] = sz;
         cand[sz++] = v;
     }
 
-    inline void Summit::PushCand(int *cand, int &sz, int v) { cand[sz++] = v; }
+    inline void MaCH::PushCand(int *cand, int &sz, int v) { cand[sz++] = v; }
 
-    inline int Summit::SwapAndPop(int *cand, int *idx, int &sz, int pos) {
+    inline int MaCH::SwapAndPop(int *cand, int *idx, int &sz, int pos) {
         sz--;
         if (sz == pos)
             return sz;
@@ -364,7 +364,7 @@ namespace GraphLib::SubHyperGraphMatching {
         }
     }
 
-    inline int Summit::SwapAndPop(int *cand, int &sz, int pos) {
+    inline int MaCH::SwapAndPop(int *cand, int &sz, int pos) {
         sz--;
         if (sz == pos)
             return sz;
@@ -374,7 +374,7 @@ namespace GraphLib::SubHyperGraphMatching {
         }
     }
 
-    inline void Summit::EmptyQueue() {
+    inline void MaCH::EmptyQueue() {
         while (!queue_removed.empty()) {
             auto [u, e_idx] = queue_removed.front();
             queue_removed.pop();
@@ -382,7 +382,7 @@ namespace GraphLib::SubHyperGraphMatching {
         }
     }
 
-    void Summit::BuildInitialHCS() {
+    void MaCH::BuildInitialHCS() {
         int min_e = -1;
         int min_sz = __INT_MAX__;
         fprintf(log_to, "# Hyperedges with the same signature\n");
@@ -485,7 +485,7 @@ namespace GraphLib::SubHyperGraphMatching {
         }
     }
 
-    void Summit::InitializeMemory() {
+    void MaCH::InitializeMemory() {
         memcpy(initial_cand_idx[0], cand_idx[0], VqVg * sizeof(int));
         MaxStage = 1;
         for (int e = 0; e < hyper_query->GetNumHyperedges(); e++) {
@@ -502,7 +502,7 @@ namespace GraphLib::SubHyperGraphMatching {
         for (int e = 0; e < hyper_query->GetNumHyperedges(); e++) {
             for (int en_idx = 0; en_idx < query_edge_adj[e].size(); en_idx++) {
                 int en = query_edge_adj[e][en_idx];
-                VqCuDuCun_64 += cand_sz[0][e] * initial_cand_sz_64[en];
+                VqCuDuCun_64 += (long long) cand_sz[0][e] * initial_cand_sz_64[en];
                 VqCuDu += cand_sz[0][e];
             }
         }
@@ -579,7 +579,7 @@ namespace GraphLib::SubHyperGraphMatching {
         }
     }
 
-    void Summit::BuildConnection() {
+    void MaCH::BuildConnection() {
         int min_e = -1;
         int min_sz = __INT_MAX__;
         for (int e = 0; e < hyper_query->GetNumHyperedges(); e++) {
@@ -723,7 +723,7 @@ namespace GraphLib::SubHyperGraphMatching {
         }
     }
 
-    bool Summit::RestoreLocalMatch(int e, int f, int en_idx, int stage) {
+    bool MaCH::RestoreLocalMatch(int e, int f, int en_idx, int stage) {
         int en = query_edge_adj[e][en_idx];
         int f_idx = initial_cand_idx[e][f];
         int &fn_64 = local_match[e][f_idx][en_idx];
@@ -738,7 +738,7 @@ namespace GraphLib::SubHyperGraphMatching {
         return false;
     }
 
-    bool Summit::FilterHCS(int stage) {
+    bool MaCH::FilterHCS(int stage) {
         while (!queue_removed.empty()) {
             auto [e, en_idx] = queue_removed.front();
             queue_removed.pop();
@@ -775,7 +775,7 @@ namespace GraphLib::SubHyperGraphMatching {
         return true;
     }
 
-    bool Summit::backtracking() {
+    bool MaCH::backtracking() {
         auto print_embedding = [&](int stage, int last_e = -1) {
             if (last_e == -1) {
                 fprintf(log_to, "  Embedding Found {");

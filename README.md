@@ -1,7 +1,7 @@
 ## Subhypergraph-Matching
 
-**SUMMIT: Subhypergraph Matching via Match-and-Clean and Intersection Constraint Together**
-(Submitted to SIGMOD 2025)
+**Efficient Pattern Matching in Hypergraphs via Match-and-Clean and Intersection Constraint**
+(Submitted to VLDB 2025)
 
 ## Dependencies
 - g++ compiler with C++20 support
@@ -18,7 +18,7 @@ mkdir build
 cd build
 cmake .. && make
 ```
-This will generate two executables: `Summit` and `HypergraphPreprocessing`.
+This will generate two executables: `MaCH` and `HypergraphPreprocessing`.
 
 Build an index file from the node-label and hyperedge files:
 ```bash
@@ -27,7 +27,7 @@ Build an index file from the node-label and hyperedge files:
 
 Using the generated index file, you can perform subhypergraph matching:
 ```bash
-./Summit -d [path_to_index_file] -q [path_to_query]
+./MaCH -d [path_to_index_file] -q [path_to_query]
 ```
 
 To print the embeddings, add the `-p` flag. (Note: Using `-p` may significantly slow down execution if there are many embeddings.)
@@ -35,7 +35,7 @@ To print the embeddings, add the `-p` flag. (Note: Using `-p` may significantly 
 ## Example Usage 
 ```bash
 ./HypergraphPreprocessing -l ../example/node-labels-example.txt -e ../example/hyperedges-example.txt -o ../example/index-example.out 
-./Summit -d ../example/index-example.out  -q ../example/query-example.txt -p
+./MaCH -d ../example/index-example.out  -q ../example/query-example.txt -p
 ```
 The example above demonstrates the execution using the sample data in the example directory.
 
