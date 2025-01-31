@@ -1,7 +1,6 @@
 ## Subhypergraph-Matching
 
 **Efficient Pattern Matching in Hypergraphs via Match-and-Clean and Intersection Constraint**
-(Submitted to VLDB 2025)
 
 ## Dependencies
 - g++ compiler with C++20 support
