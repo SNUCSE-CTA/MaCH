@@ -1,6 +1,6 @@
-## Subhypergraph-Matching
+## Hypergraph Pattern Matching
 
-**Efficient Pattern Matching in Hypergraphs via Match-and-Clean and Intersection Constraint**
+**Efficient Hypergraph Pattern Matching via Match-and-Clean and Intersection Constraint**
 
 ## Dependencies
 - g++ compiler with C++20 support
@@ -24,7 +24,7 @@ Build an index file from the node-label and hyperedge files:
 ./HypergraphPreprocessing -l [path_to_node_labels] -e [path_to_hyperedge_file] -o [path_to_output]
 ```
 
-Using the generated index file, you can perform subhypergraph matching:
+Using the generated index file, you can perform hypergraph pattern matching:
 ```bash
 ./MaCH -d [path_to_index_file] -q [path_to_query]
 ```
