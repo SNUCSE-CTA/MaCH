@@ -1,6 +1,6 @@
 ## Hypergraph Pattern Matching
 
-**Efficient Hypergraph Pattern Matching via Match-and-Clean and Intersection Constraint**
+**Efficient Hypergraph Pattern Matching via Match-and-Filter and Intersection Constraint**
 
 ## Dependencies
 - g++ compiler with C++20 support
