@@ -17,7 +17,7 @@ mkdir build
 cd build
 cmake .. && make
 ```
-This will generate two executables: `MaCH` and `HypergraphPreprocessing`.
+This will generate three executables: `MaCH`, `MaCH_Large`, and `HypergraphPreprocessing`.
 
 Build an index file from the node-label and hyperedge files:
 ```bash
@@ -27,9 +27,10 @@ Build an index file from the node-label and hyperedge files:
 Using the generated index file, you can perform hypergraph pattern matching:
 ```bash
 ./MaCH -d [path_to_index_file] -q [path_to_query]
+./MaCH_Large -d [path_to_index_file] -q [path_to_query]
 ```
 
-To print the embeddings, add the `-p` flag. (Note: Using `-p` may significantly slow down execution if there are many embeddings.)
+For `MaCH`, you can add the `-p` flag to print the embeddings. (Note: Using `-p` may significantly slow down execution if there are many embeddings.)
 
 ## Example Usage 
 ```bash
