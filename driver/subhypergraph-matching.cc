@@ -3,7 +3,11 @@
 #include "SubhypergraphMatching/DataHyperGraph.h"
 #include "SubhypergraphMatching/PatternHyperGraph.h"
 #include "Base/Timer.h"
+#ifdef USE_LARGE
+#include "SubhypergraphMatching/MaCH_Large.h"
+#else
 #include "SubhypergraphMatching/MaCH.h"
+#endif
 using namespace std;
 using namespace GraphLib;
 

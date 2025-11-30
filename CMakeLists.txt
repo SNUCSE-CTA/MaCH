@@ -8,4 +8,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Ofast")
 include_directories(lib)
 
 add_executable(MaCH driver/subhypergraph-matching.cc)
+
+add_executable(MaCH_Large driver/subhypergraph-matching.cc)
+target_compile_definitions(MaCH_Large PRIVATE USE_LARGE)
+
 add_executable(HypergraphPreprocessing driver/hypergraph-preprocessing.cc)
