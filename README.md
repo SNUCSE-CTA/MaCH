@@ -31,6 +31,7 @@ Using the generated index file, you can perform hypergraph pattern matching:
 ```
 
 For `MaCH`, you can add the `-p` flag to print the embeddings. (Note: Using `-p` may significantly slow down execution if there are many embeddings.)
+
 MaCH_Large is optimized for large data hypergraph.
 
 ## Example Usage 
